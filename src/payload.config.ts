@@ -12,6 +12,7 @@ import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Locations} from './collections/Locations/Locations'
 import { Users } from './collections/Users'
+import { CollectionA_B_Join} from './collections/Availability/Availability'
 import { Footer } from './Footer/config'
 import { Products } from './collections/Products/Products'
 import { Header } from './Header/config'
@@ -67,7 +68,7 @@ export default buildConfig({
       connectionString: process.env.POSTGRES_URL || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Locations, Recipes, Products],
+  collections: [Pages, Posts, Media, Categories, Users, Locations, Recipes, Products, CollectionA_B_Join],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [

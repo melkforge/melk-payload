@@ -74,6 +74,8 @@ export interface Config {
     users: User;
     locations: Location;
     recipes: Recipe;
+    products: Product;
+    product_availability: ProductAvailability;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -92,6 +94,8 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     locations: LocationsSelect<false> | LocationsSelect<true>;
     recipes: RecipesSelect<false> | RecipesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    product_availability: ProductAvailabilitySelect<false> | ProductAvailabilitySelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -763,6 +767,28 @@ export interface Recipe {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  sku: string;
+  product_name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product_availability".
+ */
+export interface ProductAvailability {
+  id: number;
+  location_id: number | Location;
+  product_id: number | Product;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -960,6 +986,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'recipes';
         value: number | Recipe;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'product_availability';
+        value: number | ProductAvailability;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1343,6 +1377,26 @@ export interface RecipesSelect<T extends boolean = true> {
   author?: T;
   ingredients?: T;
   instructions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  sku?: T;
+  product_name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product_availability_select".
+ */
+export interface ProductAvailabilitySelect<T extends boolean = true> {
+  location_id?: T;
+  product_id?: T;
   updatedAt?: T;
   createdAt?: T;
 }
