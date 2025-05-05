@@ -75,6 +75,26 @@ export const Posts: CollectionConfig<'posts'> = {
       required: true,
     },
     {
+      name: 'type',
+      label: 'Post Type',
+      type: 'select',
+      required: true,
+      defaultValue: 'blog',
+      options: [
+        {
+          label: 'Blog',
+          value: 'blog',
+        },
+        {
+          label: 'Recipe',
+          value: 'recipe',
+        },
+      ],
+      admin: {
+        position: 'sidebar'
+      }
+    },  
+    {
       type: 'tabs',
       tabs: [
         {
