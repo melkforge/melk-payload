@@ -91,9 +91,9 @@ export const Posts: CollectionConfig<'posts'> = {
         },
       ],
       admin: {
-        position: 'sidebar'
-      }
-    },  
+        position: 'sidebar',
+      },
+    },
     {
       type: 'tabs',
       tabs: [
