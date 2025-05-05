@@ -33,7 +33,7 @@ export default async function Page({ params: paramsPromise }: Args) {
     overrideAccess: false,
     where: {
         type: {
-          equals: 'blog',
+          equals: 'recipe',
         },
     },
   })
@@ -43,7 +43,7 @@ export default async function Page({ params: paramsPromise }: Args) {
       <PageClient />
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none">
-          <h1>Blogs</h1>
+          <h1>Recipes</h1>
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { pageNumber } = await paramsPromise
   return {
-    title: `Payload Website Template Posts Page ${pageNumber || ''}`,
+    title: `Recipes ${pageNumber || ''}`,
   }
 }
 
@@ -81,7 +81,7 @@ export async function generateStaticParams() {
     overrideAccess: false,
     where: {
         type: {
-          equals: 'blog',
+          equals: 'recipe',
         },
     },
   })
