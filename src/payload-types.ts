@@ -741,13 +741,11 @@ export interface Form {
  */
 export interface Location {
   id: number;
-  store_name: string;
-  address_line1: string;
-  address_line2?: string | null;
-  city: string;
-  province_state: string;
-  postal_code: string;
-  country: string;
+  Row_Labels: string;
+  FINAL_NAME: string;
+  Address_by_ID?: string | null;
+  City_by_ID: string;
+  Province: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1357,13 +1355,11 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "locations_select".
  */
 export interface LocationsSelect<T extends boolean = true> {
-  store_name?: T;
-  address_line1?: T;
-  address_line2?: T;
-  city?: T;
-  province_state?: T;
-  postal_code?: T;
-  country?: T;
+  Row_Labels?: T;
+  FINAL_NAME?: T;
+  Address_by_ID?: T;
+  City_by_ID?: T;
+  Province?: T;
   updatedAt?: T;
   createdAt?: T;
 }

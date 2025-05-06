@@ -36,17 +36,22 @@ const MapComponent: React.FC = () => {
             .then((res) => res.json())
             .then((data) => {
                 const locations = data.docs;
-                console.log(locations);
+                
                 locationOBJ = locations;
-                formattedLocations = locations.map(
-                    (loc: any) => `${loc.address_line1}, ${loc.city}`
+
+                //console.log(locationOBJ);
+                formattedLocations = locationOBJ.map(
+                    (loc: any) => `${loc.FINAL_NAME}, ${loc.Address_by_ID}, ${loc.City_by_ID}, ${loc.Province}`
                 );
 
+                //console.log(formattedLocations);
+              
 
                 for (let i = 0; i < formattedLocations.length; i++) {
                     fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(formattedLocations[i] as string)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`)
                         .then(res => res.json())
                         .then(res => {
+                            console.log(res);
                             const [longitude, latitude] = res.features[0].geometry.coordinates;
 
                             const marker = new mapboxgl.Marker()
