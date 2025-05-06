@@ -51,12 +51,15 @@ const MapComponent: React.FC = () => {
                     fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(formattedLocations[i] as string)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`)
                         .then(res => res.json())
                         .then(res => {
-                            console.log(res);
+                            if(!res.features || res.features.length === 0) {
+                                console.error(`no results for: ${formattedLocations[i]}`);
+                                return;
+                            }
                             const [longitude, latitude] = res.features[0].geometry.coordinates;
 
                             const marker = new mapboxgl.Marker()
                                 .setLngLat([longitude, latitude])
-                                .setPopup(new mapboxgl.Popup().setHTML(`<div style="color: red;">${locationOBJ[i].store_name}<br>${locationOBJ[i].address_line1}</div>`))
+                                .setPopup(new mapboxgl.Popup().setHTML(`<div style="color: black;">${locationOBJ[i].FINAL_NAME}<br>${locationOBJ[i].Address_by_ID}<br>${locationOBJ[i].City_by_ID}<br>${locationOBJ[i].Province}</div>`))
                                 .addTo(map)
                         });
                 }
