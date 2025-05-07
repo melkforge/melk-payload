@@ -65,14 +65,14 @@ const MapComponent: React.FC = () => {
       let formattedLocations: string[];
       let locationOBJ: any;
 
-      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/locations`)
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/locations?limit=1000`)
         .then((res) => res.json())
         .then((data) => {
           const locations = data.docs;
           console.log(locations);
           locationOBJ = locations;
           formattedLocations = locations.map(
-            (loc: any) => `${loc.address_line1}, ${loc.city}`
+            (loc: any) => `${loc.FINAL_NAME}, ${loc.Address_by_ID}, ${loc.City_by_ID}, ${loc.Province}`
           );
 
 
@@ -84,7 +84,7 @@ const MapComponent: React.FC = () => {
 
                 const marker = new mapboxgl.Marker()
                   .setLngLat([longitude, latitude])
-                  .setPopup(new mapboxgl.Popup().setHTML(`<div style="color: red;">${locationOBJ[i].store_name}<br>${locationOBJ[i].address_line1}</div>`))
+                  .setPopup(new mapboxgl.Popup().setHTML(`<div style="color: black;">${locationOBJ[i].FINAL_NAME}<br>${locationOBJ[i].Address_by_ID}<br>${locationOBJ[i].City_by_ID}<br>${locationOBJ[i].Province}</div>`))
                   .addTo(map)
               });
           }
