@@ -3,40 +3,42 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl, { GeoJSONSource } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { stringify } from "qs-esm";
 import { Where } from "payload";
 
+
 // FILTERING FUNCTION, UNUESD FOR NOW
-const getProducts = async (item: string) => {
+// const getProducts = async (item: string) => {
 
-  let formattedLocations: string[];
-  let locationOBJ: any;
+//   let formattedLocations: string[];
+//   let locationOBJ: any;
 
-  const product_query: Where = {
-    'product_id.product_name': {
-      equals: item,
-    },
-  }
+//   const product_query: Where = {
+//     'product_id.product_name': {
+//       equals: item,
+//     },
+//   }
 
-  let stringifiedQuery = stringify(
-    {
-      where: product_query,
-    },
-    { addQueryPrefix: true },
-  )
+//   let stringifiedQuery = stringify(
+//     {
+//       where: product_query,
+//     },
+//     { addQueryPrefix: true },
+//   )
 
-  const product_response = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/product_availability${stringifiedQuery}`,
-  );
+//   const product_response = await fetch(
+//     `${process.env.NEXT_PUBLIC_SERVER_URL}/api/product_availability${stringifiedQuery}`,
+//   );
 
-  const product_data = await product_response.json();
-  locationOBJ = product_data.docs;
+//   const product_data = await product_response.json();
+//   locationOBJ = product_data.docs;
 
-  formattedLocations = locationOBJ.map(
-    (loc: any) => `${loc.location_id.FINAL_NAME}, ${loc.location_id.Address_by_ID}, ${loc.location_id.City_by_ID}, ${loc.location_id.Province}`
-  );
-  console.log(formattedLocations);
-}
+//   formattedLocations = locationOBJ.map(
+//     (loc: any) => `${loc.location_id.FINAL_NAME}, ${loc.location_id.Address_by_ID}, ${loc.location_id.City_by_ID}, ${loc.location_id.Province}`
+//   );
+//   console.log(formattedLocations);
+// }
 
 interface MovingObject {
   id: number;
@@ -69,7 +71,7 @@ const MapComponent: React.FC = () => {
         .then((res) => res.json())
         .then((data) => {
           const locations = data.docs;
-          console.log(locations);
+          //console.log(locations);
           locationOBJ = locations;
           formattedLocations = locations.map(
             (loc: any) => `${loc.FINAL_NAME}, ${loc.Address_by_ID}, ${loc.City_by_ID}, ${loc.Province}`
@@ -89,7 +91,10 @@ const MapComponent: React.FC = () => {
               });
           }
 
-          getProducts("Matt");
+          //getProducts("Matt");
+
+          //fullscreen 
+          map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
 
           // formattedLocations.forEach((address) => {
 
@@ -117,6 +122,7 @@ const MapComponent: React.FC = () => {
   }, []);
 
   return (
+    
     <div
       ref={mapContainer}
       style={{
