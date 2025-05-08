@@ -8,7 +8,7 @@ const MapComponent = dynamic(() => import("@/components/Map/index"));
 const DropdownSelector = dynamic(() => import("@/components/DropdownSelector/index"), { ssr: false });
 
 export default function StoreFinderPage() {
-  // const [selectedItem, setSelectedItem] = useState('');
+  const [selectedItem, setSelectedItem] = useState('');
 
   const [locations, setLocations] = useState<any[]>([]);
   const [searchStores, setSearchStores] = useState('');
@@ -52,10 +52,11 @@ export default function StoreFinderPage() {
   return (
 
     <div className="flex h-screen">
-        {/* <div className="flex flex-col gap-4">
-          <DropdownSelector selectedItem={selectedItem} setSelectedItem={setSelectedItem} />
-        </div> */}
+        
         <div className="w-1/3 bg-white shadow-lg p-4 overflow-y-auto">
+          <div className="flex flex-col gap-4">
+            <DropdownSelector selectedItem={selectedItem} setSelectedItem={setSelectedItem} />
+          </div>
           <h1 className="text-2xl font-bold mb-4 text-gray-800">Find a Store</h1>
 
           <input
@@ -73,7 +74,7 @@ export default function StoreFinderPage() {
 
           <ul className="space-y-3 text-black" >
             {locations.map((location) => (
-              <li key={location._id} className="p-4 bg-gray-100 rounded shadow hover:bg-gray-200 transition duration-200">
+              <li key={location.id} className="p-4 bg-gray-100 rounded shadow hover:bg-gray-200 transition duration-200">
                 <h2 className="text-lg font-semibold">{location.FINAL_NAME}</h2>
                 <p>{location.Address_by_ID}, {location.City_by_ID}, {location.Province}</p>
               </li>
