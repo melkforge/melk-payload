@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { Suspense, useState, useEffect, use } from 'react';
+import * as turf from '@turf/turf';
 
 
 const MapComponent = dynamic(() => import("@/components/Map/index"));
@@ -13,6 +14,9 @@ export default function StoreFinderPage() {
   const [locations, setLocations] = useState<any[]>([]);
   const [searchStores, setSearchStores] = useState('');
   const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
+  const [filteredLocations, setFilteredLocations] = useState<any[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
+  const [kmRadius, setKmRadius] = useState(20);
 
   const handleSearchStores = async () => {
     if (searchStores.length === 0) return;
@@ -27,7 +31,44 @@ export default function StoreFinderPage() {
       ];
 
       setUserCoords(coords);
-      console.log("user coords", coords);
+
+
+
+      const originPoint = turf.point(coords);
+
+
+      const nearby = await Promise.all(
+        locations.map(async (loc) => {
+          const address = [
+            loc.FINAL_NAME,
+            loc.Address_by_ID,
+            loc.City_by_ID,
+            loc.Province
+          ].join(', ');
+
+
+          const geores = await fetch(
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
+          );
+          const j = await geores.json();
+          if (!j.features?.length) return null;
+
+
+          const [lng, lat] = j.features[0].geometry.coordinates;
+          const dest = turf.point([lng, lat]);
+          const dist = turf.distance(originPoint, dest, { units: 'kilometers' });
+
+
+          return dist <= kmRadius ? loc : null;
+        })
+      );
+
+      setFilteredLocations(nearby.filter((loc) => loc !== null));
+
+
+
+
+
     } else {
       console.log("No results found for the given location.");
     }
@@ -49,6 +90,11 @@ export default function StoreFinderPage() {
         console.error('Error. Could not fetch locations:', error);
       });
   }, []);
+
+
+  const listToDisplay = filteredLocations.length > 0 ? filteredLocations : locations;
+
+
   return (
 
     <div className="flex h-screen">
@@ -68,25 +114,34 @@ export default function StoreFinderPage() {
           className="w-full p-2 border border-grey-300 rounded mb-4 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
         />
 
+        <input type="number"
+          placeholder='Set Radius'
+          value={kmRadius}
+          onChange={(e) => setKmRadius(Number(e.target.value))}
+          className="w-full p-2 border border-grey-300 rounded mb-4 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+        />
+
+
+
         <button onClick={handleSearchStores} className="w-full bg-blue-500 text-white p-2 rounded mb-4 hover:bg-blue-600 transition duration-200">
           Search
         </button>
 
         <ul className="space-y-3 text-black" >
-          {locations.map((location) => (
-            <li key={location.id} className="p-4 bg-gray-100 rounded shadow hover:bg-gray-200 transition duration-200">
+          {listToDisplay.map((location) => (
+            <li key={location.id} onClick={() => setSelectedLocation(location)} className="p-4 bg-gray-100 rounded shadow hover:bg-gray-200 transition duration-200">
               <h2 className="text-lg font-semibold">{location.FINAL_NAME}</h2>
               <p>{location.Address_by_ID}, {location.City_by_ID}, {location.Province}</p>
             </li>
           ))}
         </ul>
+
       </div>
 
 
       <div className="w-2/3 h-screen">
         <div className="w-full h-full">
-          <MapComponent userCoords={userCoords} selectedItem={selectedItem} />
-        </div>
+          <MapComponent userCoords={userCoords} selectedItem={selectedItem} selectedLocation={selectedLocation} />        </div>
       </div>
 
     </div>
