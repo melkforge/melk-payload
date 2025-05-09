@@ -142,7 +142,7 @@ export default function StoreFinderPage() {
 
       <div className="w-2/3 h-screen">
         <div className="w-full h-full">
-          <MapComponent userCoords={userCoords} selectedItem={selectedItem} selectedLocation={selectedLocation} />        </div>
+          <MapComponent userCoords={userCoords} selectedItem={selectedItem} selectedLocation={selectedLocation} locationList={locationList} />        </div>
       </div>
 
     </div>
