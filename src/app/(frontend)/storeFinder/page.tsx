@@ -17,6 +17,7 @@ export default function StoreFinderPage() {
   const [filteredLocations, setFilteredLocations] = useState<any[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
   const [kmRadius, setKmRadius] = useState(0);
+  const [locationList] = useState<any | null>(null);
 
   const handleSearchStores = async () => {
     if (searchStores.length === 0) return;

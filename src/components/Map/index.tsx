@@ -44,6 +44,7 @@ interface MapComponentProps {
   userCoords: [number, number] | null;
   selectedItem: string | null;
   selectedLocation: any | null;
+  locationList: any | null;
 }
 
 function plotPoints(locations: any, currentMap: any, markers: any) {
@@ -94,7 +95,7 @@ function plotPoints(locations: any, currentMap: any, markers: any) {
   });
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, selectedLocation }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, selectedLocation, locationList }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   let markers = useRef<mapboxgl.Marker[]>([]);
@@ -130,6 +131,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, s
         markers.current.forEach(marker => marker.remove());
 
         plotPoints(locations, map, markers)
+
+        console.log(selectedItem);
 
       };
 
