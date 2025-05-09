@@ -145,23 +145,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, s
           //fullscreen 
           map.addControl(new mapboxgl.FullscreenControl({ container: document.querySelector('body') }));
 
-
-
-          // formattedLocations.forEach((address) => {
-
-          //     fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`)
-          //         .then(res => res.json())
-          //         .then(res => {
-          //             const [longitude, latitude] = res.features[0].geometry.coordinates;
-
-          //             const marker = new mapboxgl.Marker()
-          //                 .setLngLat([longitude, latitude])
-          //                 .setPopup(new mapboxgl.Popup().setHTML(`<h3>hello</h3>`))
-          //                 .addTo(map)
-
-          //         })
-          // });
-
           // Add zoom controls
           map.addControl(new mapboxgl.NavigationControl(), "top-left");
 
