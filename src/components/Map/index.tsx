@@ -42,13 +42,13 @@ import { Where } from "payload";
 
 interface MapComponentProps {
   userCoords: [number, number] | null;
+  selectedItem: string | null;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ userCoords }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-
-  
+  let markers = useRef<mapboxgl.Marker[]>([]);
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -63,7 +63,48 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords }) => {
 
       mapRef.current = map;
 
-     
+      const plotMarkers = async () => {
+        if (!selectedItem) return;
+
+        const query: Where = {
+          'product_id.product_name': { equals: selectedItem }
+        };
+
+        const stringifiedQuery = stringify({ where: query }, { addQueryPrefix: true });
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/product_availability${stringifiedQuery}`);
+        const data = await response.json();
+        const locations = data.docs;
+
+        markers.current.forEach(marker => marker.remove());
+
+        locations.forEach((loc: any) => {
+          const address = `${loc.location_id.FINAL_NAME}, ${loc.location_id.Address_by_ID}, ${loc.location_id.City_by_ID}, ${loc.location_id.Province}`;
+
+          fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxgl.accessToken}`)
+            .then(res => res.json())
+            .then(geo => {
+              if (!geo.features?.length) return;
+
+              const [lng, lat] = geo.features[0].geometry.coordinates;
+
+              const marker = new mapboxgl.Marker()
+                .setLngLat([lng, lat])
+                .setPopup(new mapboxgl.Popup().setHTML(`
+                  <div style="color: black;">
+                    ${loc.location_id.FINAL_NAME}<br/>
+                    ${loc.location_id.Address_by_ID}<br/>
+                    ${loc.location_id.City_by_ID}, ${loc.location_id.Province}
+                  </div>
+                `))
+                .addTo(map);
+
+              markers.current.push(marker);
+            });
+        });
+      };
+
+      plotMarkers();
 
       // let formattedLocations: string[];
       // let locationOBJ: any;
@@ -71,6 +112,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords }) => {
       fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/locations?limit=1000`)
         .then((res) => res.json())
         .then((data) => {
+          markers.current.forEach(marker => marker.remove());
           const locations = data.docs;
           locations.forEach((loc: any) => {
             const address = `${loc.FINAL_NAME}, ${loc.Address_by_ID}, ${loc.City_by_ID}, ${loc.Province}`;
@@ -82,7 +124,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords }) => {
 
                 const [lng, lat] = geo.features[0].geometry.coordinates;
 
-                new mapboxgl.Marker()
+                const marker = new mapboxgl.Marker()
                   .setLngLat([lng, lat])
                   .setPopup(new mapboxgl.Popup().setHTML(`
                     <div style="color: black;">
@@ -92,15 +134,19 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords }) => {
                     </div>
                   `))
                   .addTo(map);
+
+                markers.current.push(marker);
               });
+
+
           });
 
           //getProducts("Matt");
 
           //fullscreen 
-          map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+          map.addControl(new mapboxgl.FullscreenControl({ container: document.querySelector('body') }));
 
-         
+
 
           // formattedLocations.forEach((address) => {
 
@@ -123,11 +169,12 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords }) => {
         });
 
       // Clean up on unmount
-      return () => { map.remove();
+      return () => {
+        map.remove();
         mapRef.current = null;
-       };
+      };
     }
-  }, []);
+  }, [selectedItem]);
 
 
   useEffect(() => {
@@ -137,7 +184,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords }) => {
   }, [userCoords]);
 
   return (
-    
+
     <div
       ref={mapContainer}
       style={{
