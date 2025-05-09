@@ -16,7 +16,8 @@ export default function StoreFinderPage() {
   const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
   const [filteredLocations, setFilteredLocations] = useState<any[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
-  const [kmRadius, setKmRadius] = useState(20);
+  const [kmRadius, setKmRadius] = useState(0);
+  const [locationList] = useState<any | null>(null);
 
   const handleSearchStores = async () => {
     if (searchStores.length === 0) return;
@@ -99,7 +100,7 @@ export default function StoreFinderPage() {
 
     <div className="flex h-screen">
 
-      <div className="w-1/3 bg-white shadow-lg p-4 overflow-y-auto">
+      <div className="w-1/3 bg-white shadow-lg p-4 overflow-y-auto text-black">
         <div className="flex flex-col gap-4">
           <DropdownSelector selectedItem={selectedItem} setSelectedItem={setSelectedItem} />
         </div>
