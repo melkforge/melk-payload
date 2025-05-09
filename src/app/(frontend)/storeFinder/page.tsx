@@ -19,6 +19,8 @@ export default function StoreFinderPage() {
   const [kmRadius, setKmRadius] = useState(0);
   const [locationList, setLocationList] = useState<any | null>(null);
 
+  console.log("WORK NOW");
+
   const handleSearchStores = async () => {
     if (searchStores.length === 0) return;
 
