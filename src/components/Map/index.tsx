@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import mapboxgl, { GeoJSONSource } from "mapbox-gl";
+import mapboxgl, { GeoJSONSource, Marker } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { stringify } from "qs-esm";
@@ -46,6 +46,54 @@ interface MapComponentProps {
   selectedLocation: any | null;
 }
 
+function plotPoints(locations: any, currentMap: any, markers: any) {
+  locations.forEach((loc: any) => {
+    let address: string = "";
+    let marker: Marker;
+
+    if (!loc.product_id) {
+      address = `${loc.FINAL_NAME}, ${loc.Address_by_ID}, ${loc.City_by_ID}, ${loc.Province}`;
+    } else {
+      address = `${loc.location_id.FINAL_NAME}, ${loc.location_id.Address_by_ID}, ${loc.location_id.City_by_ID}, ${loc.location_id.Province}`;
+    }
+
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxgl.accessToken}`)
+      .then(res => res.json())
+      .then(geo => {
+        if (!geo.features?.length) return;
+
+        const [lng, lat] = geo.features[0].geometry.coordinates;
+
+        if (!loc.product_id) {
+          marker = new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                  <div style="color: black;">
+                    ${loc.FINAL_NAME}<br/>
+                    ${loc.Address_by_ID}<br/>
+                    ${loc.City_by_ID}, ${loc.Province}
+                  </div>
+                `))
+            .addTo(currentMap);
+        } else {
+          marker = new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                  <div style="color: black;">
+                    ${loc.location_id.FINAL_NAME}<br/>
+                    ${loc.location_id.Address_by_ID}<br/>
+                    ${loc.location_id.City_by_ID}, ${loc.location_id.Province}
+                  </div>
+                `))
+            .addTo(currentMap);
+        }
+
+
+        markers.current.push(marker);
+      });
+  });
+}
+
 const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, selectedLocation }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -77,72 +125,22 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, s
         const data = await response.json();
         const locations = data.docs;
 
+        console.log(locations);
+
         markers.current.forEach(marker => marker.remove());
 
-        locations.forEach((loc: any) => {
-          const address = `${loc.location_id.FINAL_NAME}, ${loc.location_id.Address_by_ID}, ${loc.location_id.City_by_ID}, ${loc.location_id.Province}`;
+        plotPoints(locations, map, markers)
 
-          fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxgl.accessToken}`)
-            .then(res => res.json())
-            .then(geo => {
-              if (!geo.features?.length) return;
-
-              const [lng, lat] = geo.features[0].geometry.coordinates;
-
-              const marker = new mapboxgl.Marker()
-                .setLngLat([lng, lat])
-                .setPopup(new mapboxgl.Popup().setHTML(`
-                  <div style="color: black;">
-                    ${loc.location_id.FINAL_NAME}<br/>
-                    ${loc.location_id.Address_by_ID}<br/>
-                    ${loc.location_id.City_by_ID}, ${loc.location_id.Province}
-                  </div>
-                `))
-                .addTo(map);
-
-              markers.current.push(marker);
-            });
-        });
       };
 
       plotMarkers();
-
-      // let formattedLocations: string[];
-      // let locationOBJ: any;
 
       fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/locations?limit=1000`)
         .then((res) => res.json())
         .then((data) => {
           markers.current.forEach(marker => marker.remove());
           const locations = data.docs;
-          locations.forEach((loc: any) => {
-            const address = `${loc.FINAL_NAME}, ${loc.Address_by_ID}, ${loc.City_by_ID}, ${loc.Province}`;
-
-            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxgl.accessToken}`)
-              .then(res => res.json())
-              .then(geo => {
-                if (!geo.features?.length) return;
-
-                const [lng, lat] = geo.features[0].geometry.coordinates;
-
-                const marker = new mapboxgl.Marker()
-                  .setLngLat([lng, lat])
-                  .setPopup(new mapboxgl.Popup().setHTML(`
-                    <div style="color: black;">
-                      ${loc.FINAL_NAME}<br/>
-                      ${loc.Address_by_ID}<br/>
-                      ${loc.City_by_ID}, ${loc.Province}
-                    </div>
-                  `))
-                  .addTo(map);
-
-                markers.current.push(marker);
-              });
-
-
-          });
-
-          //getProducts("Matt");
+          plotPoints(locations, map, markers)
 
           //fullscreen 
           map.addControl(new mapboxgl.FullscreenControl({ container: document.querySelector('body') }));
