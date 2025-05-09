@@ -43,9 +43,10 @@ import { Where } from "payload";
 interface MapComponentProps {
   userCoords: [number, number] | null;
   selectedItem: string | null;
+  selectedLocation: any | null;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, selectedLocation }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   let markers = useRef<mapboxgl.Marker[]>([]);
@@ -182,6 +183,33 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem })
       mapRef.current.flyTo({ center: userCoords, zoom: 12 });
     }
   }, [userCoords]);
+
+
+  useEffect(() => {
+    if (selectedLocation && mapRef.current) {
+      const address = `${selectedLocation.FINAL_NAME}, ${selectedLocation.Address_by_ID}, ${selectedLocation.City_by_ID}, ${selectedLocation.Province}`;
+
+      fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxgl.accessToken}`)
+        .then(res => res.json())
+        .then(geo => {
+          console.log("geo", geo);
+          if (geo.features?.length) {
+            const [lng, lat] = geo.features[0].geometry.coordinates;
+            mapRef.current?.flyTo({
+              center: [lng, lat],
+              zoom: 14
+            });
+
+            const marker = markers.current.find(m => {
+              const markerLngLat = m.getLngLat();
+              return markerLngLat.lng === lng && markerLngLat.lat === lat;
+            });
+            marker?.togglePopup();
+          }
+        });
+    }
+  }, [selectedLocation]);
+
 
   return (
 
