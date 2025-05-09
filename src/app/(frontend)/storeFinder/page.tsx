@@ -19,7 +19,6 @@ export default function StoreFinderPage() {
   const [kmRadius, setKmRadius] = useState(0);
   const [locationList, setLocationList] = useState<any | null>(null);
 
-  console.log("WORK NOW");
 
   const handleSearchStores = async () => {
     if (searchStores.length === 0) return;
@@ -97,7 +96,9 @@ export default function StoreFinderPage() {
 
   const listToDisplay = filteredLocations.length > 0 ? filteredLocations : locations;
 
+  // console.log("LIST: ", listToDisplay);
 
+  console.log(filteredLocations);
   return (
 
     <div className="flex h-screen">
@@ -144,7 +145,7 @@ export default function StoreFinderPage() {
 
       <div className="w-2/3 h-screen">
         <div className="w-full h-full">
-          <MapComponent userCoords={userCoords} selectedItem={selectedItem} selectedLocation={selectedLocation} locationList={locationList} />        </div>
+          <MapComponent userCoords={userCoords} selectedItem={selectedItem} selectedLocation={selectedLocation} locationList={locationList} setLocationList={setLocationList} />        </div>
       </div>
 
     </div>
