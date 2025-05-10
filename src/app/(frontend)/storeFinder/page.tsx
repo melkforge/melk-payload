@@ -17,7 +17,10 @@ export default function StoreFinderPage() {
   const [filteredLocations, setFilteredLocations] = useState<any[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
   const [kmRadius, setKmRadius] = useState(0);
-  const [locationList, setLocationList] = useState<any | null>(null);
+  const [locationList, setLocationList] = useState<any[]>([]);
+
+  console.log("locationList full:", locationList);
+
 
 
   const handleSearchStores = async () => {
@@ -85,7 +88,7 @@ export default function StoreFinderPage() {
       .then((res) => res.json())
       .then((data) => {
         const locations = data.docs;
-        console.log(locations);
+
         setLocations(locations);
       })
       .catch((error) => {
@@ -94,11 +97,12 @@ export default function StoreFinderPage() {
   }, []);
 
 
-  const listToDisplay = filteredLocations.length > 0 ? filteredLocations : locations;
+  const listToDisplay = locationList.length > 0 ? locationList : filteredLocations.length > 0 ? filteredLocations : locations;
 
-  // console.log("LIST: ", listToDisplay);
 
-  console.log(filteredLocations);
+
+
+
   return (
 
     <div className="flex h-screen">

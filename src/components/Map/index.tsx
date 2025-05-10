@@ -37,7 +37,7 @@ import { Where } from "payload";
 //   formattedLocations = locationOBJ.map(
 //     (loc: any) => `${loc.location_id.FINAL_NAME}, ${loc.location_id.Address_by_ID}, ${loc.location_id.City_by_ID}, ${loc.location_id.Province}`
 //   );
-//   console.log(formattedLocations);
+//   
 // }
 
 interface MapComponentProps {
@@ -127,7 +127,13 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, s
         const data = await response.json();
         const locations = data.docs;
 
-        setLocationList(locations)
+
+
+        //look here
+        setLocationList(locations.map((loc: any) => loc.location_id));
+
+
+
 
         markers.current.forEach(marker => marker.remove());
         plotPoints(locations, map, markers)
@@ -173,7 +179,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ userCoords, selectedItem, s
       fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxgl.accessToken}`)
         .then(res => res.json())
         .then(geo => {
-          console.log("geo", geo);
+
           if (geo.features?.length) {
             const [lng, lat] = geo.features[0].geometry.coordinates;
             mapRef.current?.flyTo({
